@@ -1,6 +1,6 @@
-import { inject, injectable } from 'inversify'
+import { inject, injectable, named } from 'inversify'
 import 'reflect-metadata'
-import { RangeWeapon, Warrior, Weapon } from '../interfaces'
+import { Armor, RangeWeapon, Warrior, Weapon } from '../interfaces'
 import { TYPES } from '../types'
 
 @injectable()
@@ -32,11 +32,27 @@ class Bow implements RangeWeapon {
 }
 
 @injectable()
+class PlateChest implements Armor {
+    async create(): Promise<Armor> {
+        console.log('Creating PlateChest')
+        return new Promise<Armor>((res) => {
+            setTimeout(() => {
+                console.log('Executing setimeout')
+                res(this)
+            }, 10)
+        })
+    }
+}
+
+@injectable()
 class Ninja implements Warrior {
     private _katana: Weapon
     private _shuriken: RangeWeapon
 
-    public constructor(@inject(TYPES.Katana) katana: Weapon, @inject(TYPES.Shuriken) shuriken: RangeWeapon) {
+    public constructor(
+        @inject(TYPES.Weapon) @named('katana') katana: Weapon,
+        @inject(TYPES.RangeWeapon) @named('shuriken') shuriken: RangeWeapon
+    ) {
         this._katana = katana
         this._shuriken = shuriken
     }
@@ -51,8 +67,8 @@ class Ninja implements Warrior {
 
 @injectable()
 class Knight implements Warrior {
-    @inject(TYPES.Sword) private _sword: Weapon
-    @inject(TYPES.Bow) private _bow: RangeWeapon
+    @inject(TYPES.Weapon) @named('sword') private _sword: Weapon
+    @inject(TYPES.RangeWeapon) @named('bow') private _bow: RangeWeapon
     public fight() {
         return this._sword.hit()
     }
@@ -61,5 +77,21 @@ class Knight implements Warrior {
     }
 }
 
-export { Ninja, Katana, Shuriken, Knight, Sword, Bow }
+@injectable()
+class Soldier implements Warrior {
+    private _armor: Armor
+
+    public equipArmor(armor: Armor) {
+        this._armor = armor
+    }
+
+    public sneak() {
+        return `Fighting with ${this._armor}`
+    }
+    fight(): string {
+        return `Fighting with ${this._armor}`
+    }
+}
+
+export { Ninja, Katana, Shuriken, Knight, Sword, Bow, Soldier, PlateChest }
 

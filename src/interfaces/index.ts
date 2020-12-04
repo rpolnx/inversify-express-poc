@@ -1,12 +1,16 @@
 export interface Warrior {
-    fight(): string;
-    sneak(): string;
+    fight(): string
+    sneak(): string
 }
 
 export interface Weapon {
-    hit(): string;
+    hit(): string
 }
 
 export interface RangeWeapon {
-    throw(): string;
+    throw(): string
+}
+
+export interface Armor {
+    create(): Promise<Armor>
 }
